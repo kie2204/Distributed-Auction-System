@@ -1,0 +1,55 @@
+syntax = "proto3";
+option go_package = "Auction/grpc/proto";
+
+message Empty {}
+
+/* For service discovery */
+message Node {
+    int32 port = 1;
+}
+
+message Nodes {
+    repeated int32 port = 1;
+}
+
+/* Elections */
+message Request {
+    int32 timestamp = 2;
+    int32 port = 3;
+}
+
+/* Bidding */
+enum State {
+    SUCCESS = 0;
+    FAIL = 1;
+    EXCEPTION = 2;
+}
+
+message Bid {
+    int32 amount = 1;
+}
+
+message Ack {
+    State state = 2;
+}
+
+message Result {
+    bool done = 3;
+    string winner = 4;
+    int32 highest_bid = 5;
+}
+
+service AuctionNodeService {
+    // Service discovery
+    rpc Announce (Node) returns (Empty) {};
+    rpc GetNodes (Empty) returns (Nodes) {};
+    rpc Ready (Empty) returns (Empty) {};
+
+    // The bully 
+    rpc Election (Empty) returns (Empty) {};
+    rpc Coordinator (Request) returns (Empty) {};
+
+    // Auction
+    rpc SendBid (Bid) returns (Ack) {};
+    rpc GetResult (Empty) returns (Result) {};
+}
