@@ -19,11 +19,16 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AuctionNodeService_Announce_FullMethodName    = "/AuctionNodeService/Announce"
-	AuctionNodeService_GetNodes_FullMethodName    = "/AuctionNodeService/GetNodes"
-	AuctionNodeService_Ready_FullMethodName       = "/AuctionNodeService/Ready"
-	AuctionNodeService_Election_FullMethodName    = "/AuctionNodeService/Election"
-	AuctionNodeService_Coordinator_FullMethodName = "/AuctionNodeService/Coordinator"
+	AuctionNodeService_Announce_FullMethodName       = "/AuctionNodeService/Announce"
+	AuctionNodeService_GetNodes_FullMethodName       = "/AuctionNodeService/GetNodes"
+	AuctionNodeService_Ready_FullMethodName          = "/AuctionNodeService/Ready"
+	AuctionNodeService_Election_FullMethodName       = "/AuctionNodeService/Election"
+	AuctionNodeService_Coordinator_FullMethodName    = "/AuctionNodeService/Coordinator"
+	AuctionNodeService_GetCoordinator_FullMethodName = "/AuctionNodeService/GetCoordinator"
+	AuctionNodeService_SendBid_FullMethodName        = "/AuctionNodeService/SendBid"
+	AuctionNodeService_GetResult_FullMethodName      = "/AuctionNodeService/GetResult"
+	AuctionNodeService_SendUpdate_FullMethodName     = "/AuctionNodeService/SendUpdate"
+	AuctionNodeService_Ping_FullMethodName           = "/AuctionNodeService/Ping"
 )
 
 // AuctionNodeServiceClient is the client API for AuctionNodeService service.
@@ -34,9 +39,16 @@ type AuctionNodeServiceClient interface {
 	Announce(ctx context.Context, in *Node, opts ...grpc.CallOption) (*Empty, error)
 	GetNodes(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Nodes, error)
 	Ready(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error)
-	// The ricart
+	// The bully
 	Election(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error)
 	Coordinator(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Empty, error)
+	GetCoordinator(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Request, error)
+	// Auction
+	SendBid(ctx context.Context, in *Bid, opts ...grpc.CallOption) (*Ack, error)
+	GetResult(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Result, error)
+	// Replication
+	SendUpdate(ctx context.Context, in *Update, opts ...grpc.CallOption) (*Empty, error)
+	Ping(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error)
 }
 
 type auctionNodeServiceClient struct {
@@ -97,6 +109,56 @@ func (c *auctionNodeServiceClient) Coordinator(ctx context.Context, in *Request,
 	return out, nil
 }
 
+func (c *auctionNodeServiceClient) GetCoordinator(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Request, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Request)
+	err := c.cc.Invoke(ctx, AuctionNodeService_GetCoordinator_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *auctionNodeServiceClient) SendBid(ctx context.Context, in *Bid, opts ...grpc.CallOption) (*Ack, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Ack)
+	err := c.cc.Invoke(ctx, AuctionNodeService_SendBid_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *auctionNodeServiceClient) GetResult(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Result, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Result)
+	err := c.cc.Invoke(ctx, AuctionNodeService_GetResult_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *auctionNodeServiceClient) SendUpdate(ctx context.Context, in *Update, opts ...grpc.CallOption) (*Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, AuctionNodeService_SendUpdate_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *auctionNodeServiceClient) Ping(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, AuctionNodeService_Ping_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuctionNodeServiceServer is the server API for AuctionNodeService service.
 // All implementations must embed UnimplementedAuctionNodeServiceServer
 // for forward compatibility.
@@ -105,9 +167,16 @@ type AuctionNodeServiceServer interface {
 	Announce(context.Context, *Node) (*Empty, error)
 	GetNodes(context.Context, *Empty) (*Nodes, error)
 	Ready(context.Context, *Empty) (*Empty, error)
-	// The ricart
+	// The bully
 	Election(context.Context, *Empty) (*Empty, error)
 	Coordinator(context.Context, *Request) (*Empty, error)
+	GetCoordinator(context.Context, *Empty) (*Request, error)
+	// Auction
+	SendBid(context.Context, *Bid) (*Ack, error)
+	GetResult(context.Context, *Empty) (*Result, error)
+	// Replication
+	SendUpdate(context.Context, *Update) (*Empty, error)
+	Ping(context.Context, *Empty) (*Empty, error)
 	mustEmbedUnimplementedAuctionNodeServiceServer()
 }
 
@@ -132,6 +201,21 @@ func (UnimplementedAuctionNodeServiceServer) Election(context.Context, *Empty) (
 }
 func (UnimplementedAuctionNodeServiceServer) Coordinator(context.Context, *Request) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Coordinator not implemented")
+}
+func (UnimplementedAuctionNodeServiceServer) GetCoordinator(context.Context, *Empty) (*Request, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCoordinator not implemented")
+}
+func (UnimplementedAuctionNodeServiceServer) SendBid(context.Context, *Bid) (*Ack, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SendBid not implemented")
+}
+func (UnimplementedAuctionNodeServiceServer) GetResult(context.Context, *Empty) (*Result, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetResult not implemented")
+}
+func (UnimplementedAuctionNodeServiceServer) SendUpdate(context.Context, *Update) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SendUpdate not implemented")
+}
+func (UnimplementedAuctionNodeServiceServer) Ping(context.Context, *Empty) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Ping not implemented")
 }
 func (UnimplementedAuctionNodeServiceServer) mustEmbedUnimplementedAuctionNodeServiceServer() {}
 func (UnimplementedAuctionNodeServiceServer) testEmbeddedByValue()                            {}
@@ -244,6 +328,96 @@ func _AuctionNodeService_Coordinator_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuctionNodeService_GetCoordinator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuctionNodeServiceServer).GetCoordinator(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuctionNodeService_GetCoordinator_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuctionNodeServiceServer).GetCoordinator(ctx, req.(*Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuctionNodeService_SendBid_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Bid)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuctionNodeServiceServer).SendBid(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuctionNodeService_SendBid_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuctionNodeServiceServer).SendBid(ctx, req.(*Bid))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuctionNodeService_GetResult_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuctionNodeServiceServer).GetResult(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuctionNodeService_GetResult_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuctionNodeServiceServer).GetResult(ctx, req.(*Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuctionNodeService_SendUpdate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Update)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuctionNodeServiceServer).SendUpdate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuctionNodeService_SendUpdate_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuctionNodeServiceServer).SendUpdate(ctx, req.(*Update))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuctionNodeService_Ping_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuctionNodeServiceServer).Ping(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuctionNodeService_Ping_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuctionNodeServiceServer).Ping(ctx, req.(*Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AuctionNodeService_ServiceDesc is the grpc.ServiceDesc for AuctionNodeService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -270,6 +444,26 @@ var AuctionNodeService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Coordinator",
 			Handler:    _AuctionNodeService_Coordinator_Handler,
+		},
+		{
+			MethodName: "GetCoordinator",
+			Handler:    _AuctionNodeService_GetCoordinator_Handler,
+		},
+		{
+			MethodName: "SendBid",
+			Handler:    _AuctionNodeService_SendBid_Handler,
+		},
+		{
+			MethodName: "GetResult",
+			Handler:    _AuctionNodeService_GetResult_Handler,
+		},
+		{
+			MethodName: "SendUpdate",
+			Handler:    _AuctionNodeService_SendUpdate_Handler,
+		},
+		{
+			MethodName: "Ping",
+			Handler:    _AuctionNodeService_Ping_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

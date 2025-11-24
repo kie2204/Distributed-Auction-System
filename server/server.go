@@ -91,10 +91,9 @@ func (s *Server) start_server(listener net.Listener) {
 
 // ======================= Elections =========================
 
-var timestamp = 0
 var state = RELEASED
 var requests chan chan bool = make(chan chan bool, 1000)
-var leaderPort int
+var leaderPort int32
 
 func (s *Server) Election(ctx context.Context, in *proto.Empty) (*proto.Empty, error) {
 	go func() {
@@ -118,6 +117,7 @@ func (s *Server) Election(ctx context.Context, in *proto.Empty) (*proto.Empty, e
 
 		if isLeader {
 			log.Printf("I, port %d, am now coordinator", port)
+			leaderPort = port
 			for _, n := range nodes {
 				go n.Coordinator(context.Background(), &proto.Request{Port: port})
 			}
@@ -128,9 +128,15 @@ func (s *Server) Election(ctx context.Context, in *proto.Empty) (*proto.Empty, e
 }
 
 func (s *Server) Coordinator(ctx context.Context, in *proto.Request) (*proto.Empty, error) {
-	leaderPort = int(in.Port)
+	leaderPort = in.Port
 	log.Printf("Port %d is now coordinator", leaderPort)
 	return &proto.Empty{}, nil
+}
+
+func (s *Server) GetCoordinator(ctx context.Context, in *proto.Empty) (*proto.Request, error) {
+	return &proto.Request{
+		Port: leaderPort,
+	}, nil
 }
 
 // =================== Service discovery =====================
@@ -185,18 +191,56 @@ func add_client(_port int32, announce bool) {
 }
 
 // ======================== Bidding ==========================
-
-var highest_bid int32
+var timestamp int32 = 0
+var highest_bid int32 = 0
+var bidder int32
 
 func (s *Server) SendBid(ctx context.Context, in *proto.Bid) (*proto.Ack, error) {
+	var state proto.State
 
-	return &proto.Ack{}, nil
+	if port != leaderPort {
+		state = proto.State_EXCEPTION
+		return &proto.Ack{State: state}, nil
+	}
+
+	if highest_bid >= in.Amount {
+		state = proto.State_FAIL
+		return &proto.Ack{State: state}, nil
+	}
+
+	highest_bid = in.Amount
+	bidder = in.Port
+	state = proto.State_SUCCESS
+
+	//Distribute to followers
+	var wg sync.WaitGroup
+	for _, v := range nodes {
+		wg.Add(1)
+		go func() {
+			out := &proto.Update{
+				Timestamp:  timestamp,
+				BidderPort: in.Port,
+				Amount:     in.Amount,
+			}
+			v.SendUpdate(context.Background(), out)
+			wg.Done()
+		}()
+	}
+	wg.Wait()
+
+	return &proto.Ack{State: state}, nil
+}
+func (s *Server) GetResult(ctx context.Context, in *proto.Empty) (*proto.Result, error) {
+	var done bool //are we done?? delete this variable
+
+	return &proto.Result{Done: done, WinnerPort: bidder, HighestBid: highest_bid}, nil
 }
 
-//
-//
-// I bid $100000000 and one cent
-// Raise
-// ALL IN
-// Check
-// Blackjack
+// ====================== Replication ========================
+
+func (s *Server) SendUpdate(ctx context.Context, in *proto.Update) (*proto.Empty, error) {
+	highest_bid = in.Amount
+	bidder = in.BidderPort
+	timestamp = in.Timestamp
+	return &proto.Empty{}, nil
+}

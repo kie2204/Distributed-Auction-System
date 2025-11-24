@@ -110,7 +110,7 @@ func (*Empty) Descriptor() ([]byte, []int) {
 // For service discovery
 type Node struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Port          int32                  `protobuf:"varint,1,opt,name=port,proto3" json:"port,omitempty"`
+	Port          int32                  `protobuf:"varint,67,opt,name=port,proto3" json:"port,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -154,7 +154,7 @@ func (x *Node) GetPort() int32 {
 
 type Nodes struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Port          []int32                `protobuf:"varint,1,rep,packed,name=port,proto3" json:"port,omitempty"`
+	Port          []int32                `protobuf:"varint,6767,rep,packed,name=port,proto3" json:"port,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -199,8 +199,7 @@ func (x *Nodes) GetPort() []int32 {
 // Elections
 type Request struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Timestamp     int32                  `protobuf:"varint,2,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
-	Port          int32                  `protobuf:"varint,3,opt,name=port,proto3" json:"port,omitempty"`
+	Port          int32                  `protobuf:"varint,676767,opt,name=port,proto3" json:"port,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -235,13 +234,6 @@ func (*Request) Descriptor() ([]byte, []int) {
 	return file_proto_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *Request) GetTimestamp() int32 {
-	if x != nil {
-		return x.Timestamp
-	}
-	return 0
-}
-
 func (x *Request) GetPort() int32 {
 	if x != nil {
 		return x.Port
@@ -251,7 +243,8 @@ func (x *Request) GetPort() int32 {
 
 type Bid struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Amount        int32                  `protobuf:"varint,1,opt,name=amount,proto3" json:"amount,omitempty"`
+	Port          int32                  `protobuf:"varint,1,opt,name=port,proto3" json:"port,omitempty"`
+	Amount        int32                  `protobuf:"varint,2,opt,name=amount,proto3" json:"amount,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -286,6 +279,13 @@ func (*Bid) Descriptor() ([]byte, []int) {
 	return file_proto_proto_rawDescGZIP(), []int{4}
 }
 
+func (x *Bid) GetPort() int32 {
+	if x != nil {
+		return x.Port
+	}
+	return 0
+}
+
 func (x *Bid) GetAmount() int32 {
 	if x != nil {
 		return x.Amount
@@ -295,7 +295,7 @@ func (x *Bid) GetAmount() int32 {
 
 type Ack struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	State         State                  `protobuf:"varint,2,opt,name=state,proto3,enum=State" json:"state,omitempty"`
+	State         State                  `protobuf:"varint,3,opt,name=state,proto3,enum=State" json:"state,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -337,18 +337,78 @@ func (x *Ack) GetState() State {
 	return State_SUCCESS
 }
 
+type Update struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Timestamp     int32                  `protobuf:"varint,4,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	Amount        int32                  `protobuf:"varint,5,opt,name=amount,proto3" json:"amount,omitempty"`
+	BidderPort    int32                  `protobuf:"varint,6,opt,name=bidder_port,json=bidderPort,proto3" json:"bidder_port,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Update) Reset() {
+	*x = Update{}
+	mi := &file_proto_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Update) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Update) ProtoMessage() {}
+
+func (x *Update) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Update.ProtoReflect.Descriptor instead.
+func (*Update) Descriptor() ([]byte, []int) {
+	return file_proto_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *Update) GetTimestamp() int32 {
+	if x != nil {
+		return x.Timestamp
+	}
+	return 0
+}
+
+func (x *Update) GetAmount() int32 {
+	if x != nil {
+		return x.Amount
+	}
+	return 0
+}
+
+func (x *Update) GetBidderPort() int32 {
+	if x != nil {
+		return x.BidderPort
+	}
+	return 0
+}
+
 type Result struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Done          bool                   `protobuf:"varint,3,opt,name=done,proto3" json:"done,omitempty"`
-	Winner        string                 `protobuf:"bytes,4,opt,name=winner,proto3" json:"winner,omitempty"`
-	HighestBid    int32                  `protobuf:"varint,5,opt,name=highest_bid,json=highestBid,proto3" json:"highest_bid,omitempty"`
+	Done          bool                   `protobuf:"varint,7,opt,name=done,proto3" json:"done,omitempty"`
+	WinnerPort    int32                  `protobuf:"varint,8,opt,name=winner_port,json=winnerPort,proto3" json:"winner_port,omitempty"`
+	HighestBid    int32                  `protobuf:"varint,9,opt,name=highest_bid,json=highestBid,proto3" json:"highest_bid,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Result) Reset() {
 	*x = Result{}
-	mi := &file_proto_proto_msgTypes[6]
+	mi := &file_proto_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -360,7 +420,7 @@ func (x *Result) String() string {
 func (*Result) ProtoMessage() {}
 
 func (x *Result) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_proto_msgTypes[6]
+	mi := &file_proto_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -373,7 +433,7 @@ func (x *Result) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Result.ProtoReflect.Descriptor instead.
 func (*Result) Descriptor() ([]byte, []int) {
-	return file_proto_proto_rawDescGZIP(), []int{6}
+	return file_proto_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *Result) GetDone() bool {
@@ -383,11 +443,11 @@ func (x *Result) GetDone() bool {
 	return false
 }
 
-func (x *Result) GetWinner() string {
+func (x *Result) GetWinnerPort() int32 {
 	if x != nil {
-		return x.Winner
+		return x.WinnerPort
 	}
-	return ""
+	return 0
 }
 
 func (x *Result) GetHighestBid() int32 {
@@ -404,31 +464,43 @@ const file_proto_proto_rawDesc = "" +
 	"\vproto.proto\"\a\n" +
 	"\x05Empty\"\x1a\n" +
 	"\x04Node\x12\x12\n" +
-	"\x04port\x18\x01 \x01(\x05R\x04port\"\x1b\n" +
-	"\x05Nodes\x12\x12\n" +
-	"\x04port\x18\x01 \x03(\x05R\x04port\";\n" +
-	"\aRequest\x12\x1c\n" +
-	"\ttimestamp\x18\x02 \x01(\x05R\ttimestamp\x12\x12\n" +
-	"\x04port\x18\x03 \x01(\x05R\x04port\"\x1d\n" +
-	"\x03Bid\x12\x16\n" +
-	"\x06amount\x18\x01 \x01(\x05R\x06amount\"#\n" +
+	"\x04port\x18C \x01(\x05R\x04port\"\x1c\n" +
+	"\x05Nodes\x12\x13\n" +
+	"\x04port\x18\xef4 \x03(\x05R\x04port\"\x1f\n" +
+	"\aRequest\x12\x14\n" +
+	"\x04port\x18\x9f\xa7) \x01(\x05R\x04port\"1\n" +
+	"\x03Bid\x12\x12\n" +
+	"\x04port\x18\x01 \x01(\x05R\x04port\x12\x16\n" +
+	"\x06amount\x18\x02 \x01(\x05R\x06amount\"#\n" +
 	"\x03Ack\x12\x1c\n" +
-	"\x05state\x18\x02 \x01(\x0e2\x06.StateR\x05state\"U\n" +
+	"\x05state\x18\x03 \x01(\x0e2\x06.StateR\x05state\"_\n" +
+	"\x06Update\x12\x1c\n" +
+	"\ttimestamp\x18\x04 \x01(\x05R\ttimestamp\x12\x16\n" +
+	"\x06amount\x18\x05 \x01(\x05R\x06amount\x12\x1f\n" +
+	"\vbidder_port\x18\x06 \x01(\x05R\n" +
+	"bidderPort\"^\n" +
 	"\x06Result\x12\x12\n" +
-	"\x04done\x18\x03 \x01(\bR\x04done\x12\x16\n" +
-	"\x06winner\x18\x04 \x01(\tR\x06winner\x12\x1f\n" +
-	"\vhighest_bid\x18\x05 \x01(\x05R\n" +
+	"\x04done\x18\a \x01(\bR\x04done\x12\x1f\n" +
+	"\vwinner_port\x18\b \x01(\x05R\n" +
+	"winnerPort\x12\x1f\n" +
+	"\vhighest_bid\x18\t \x01(\x05R\n" +
 	"highestBid*-\n" +
 	"\x05State\x12\v\n" +
 	"\aSUCCESS\x10\x00\x12\b\n" +
 	"\x04FAIL\x10\x01\x12\r\n" +
-	"\tEXCEPTION\x10\x022\xab\x01\n" +
+	"\tEXCEPTION\x10\x022\xc5\x02\n" +
 	"\x12AuctionNodeService\x12\x1b\n" +
 	"\bAnnounce\x12\x05.Node\x1a\x06.Empty\"\x00\x12\x1c\n" +
 	"\bGetNodes\x12\x06.Empty\x1a\x06.Nodes\"\x00\x12\x19\n" +
 	"\x05Ready\x12\x06.Empty\x1a\x06.Empty\"\x00\x12\x1c\n" +
 	"\bElection\x12\x06.Empty\x1a\x06.Empty\"\x00\x12!\n" +
-	"\vCoordinator\x12\b.Request\x1a\x06.Empty\"\x00B\x14Z\x12Auction/grpc/protob\x06proto3"
+	"\vCoordinator\x12\b.Request\x1a\x06.Empty\"\x00\x12$\n" +
+	"\x0eGetCoordinator\x12\x06.Empty\x1a\b.Request\"\x00\x12\x17\n" +
+	"\aSendBid\x12\x04.Bid\x1a\x04.Ack\"\x00\x12\x1e\n" +
+	"\tGetResult\x12\x06.Empty\x1a\a.Result\"\x00\x12\x1f\n" +
+	"\n" +
+	"SendUpdate\x12\a.Update\x1a\x06.Empty\"\x00\x12\x18\n" +
+	"\x04Ping\x12\x06.Empty\x1a\x06.Empty\"\x00B\x14Z\x12Auction/grpc/protob\x06proto3"
 
 var (
 	file_proto_proto_rawDescOnce sync.Once
@@ -443,7 +515,7 @@ func file_proto_proto_rawDescGZIP() []byte {
 }
 
 var file_proto_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_proto_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_proto_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_proto_proto_goTypes = []any{
 	(State)(0),      // 0: State
 	(*Empty)(nil),   // 1: Empty
@@ -452,25 +524,36 @@ var file_proto_proto_goTypes = []any{
 	(*Request)(nil), // 4: Request
 	(*Bid)(nil),     // 5: Bid
 	(*Ack)(nil),     // 6: Ack
-	(*Result)(nil),  // 7: Result
+	(*Update)(nil),  // 7: Update
+	(*Result)(nil),  // 8: Result
 }
 var file_proto_proto_depIdxs = []int32{
-	0, // 0: Ack.state:type_name -> State
-	2, // 1: AuctionNodeService.Announce:input_type -> Node
-	1, // 2: AuctionNodeService.GetNodes:input_type -> Empty
-	1, // 3: AuctionNodeService.Ready:input_type -> Empty
-	1, // 4: AuctionNodeService.Election:input_type -> Empty
-	4, // 5: AuctionNodeService.Coordinator:input_type -> Request
-	1, // 6: AuctionNodeService.Announce:output_type -> Empty
-	3, // 7: AuctionNodeService.GetNodes:output_type -> Nodes
-	1, // 8: AuctionNodeService.Ready:output_type -> Empty
-	1, // 9: AuctionNodeService.Election:output_type -> Empty
-	1, // 10: AuctionNodeService.Coordinator:output_type -> Empty
-	6, // [6:11] is the sub-list for method output_type
-	1, // [1:6] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	0,  // 0: Ack.state:type_name -> State
+	2,  // 1: AuctionNodeService.Announce:input_type -> Node
+	1,  // 2: AuctionNodeService.GetNodes:input_type -> Empty
+	1,  // 3: AuctionNodeService.Ready:input_type -> Empty
+	1,  // 4: AuctionNodeService.Election:input_type -> Empty
+	4,  // 5: AuctionNodeService.Coordinator:input_type -> Request
+	1,  // 6: AuctionNodeService.GetCoordinator:input_type -> Empty
+	5,  // 7: AuctionNodeService.SendBid:input_type -> Bid
+	1,  // 8: AuctionNodeService.GetResult:input_type -> Empty
+	7,  // 9: AuctionNodeService.SendUpdate:input_type -> Update
+	1,  // 10: AuctionNodeService.Ping:input_type -> Empty
+	1,  // 11: AuctionNodeService.Announce:output_type -> Empty
+	3,  // 12: AuctionNodeService.GetNodes:output_type -> Nodes
+	1,  // 13: AuctionNodeService.Ready:output_type -> Empty
+	1,  // 14: AuctionNodeService.Election:output_type -> Empty
+	1,  // 15: AuctionNodeService.Coordinator:output_type -> Empty
+	4,  // 16: AuctionNodeService.GetCoordinator:output_type -> Request
+	6,  // 17: AuctionNodeService.SendBid:output_type -> Ack
+	8,  // 18: AuctionNodeService.GetResult:output_type -> Result
+	1,  // 19: AuctionNodeService.SendUpdate:output_type -> Empty
+	1,  // 20: AuctionNodeService.Ping:output_type -> Empty
+	11, // [11:21] is the sub-list for method output_type
+	1,  // [1:11] is the sub-list for method input_type
+	1,  // [1:1] is the sub-list for extension type_name
+	1,  // [1:1] is the sub-list for extension extendee
+	0,  // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_proto_proto_init() }
@@ -484,7 +567,7 @@ func file_proto_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_proto_rawDesc), len(file_proto_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   7,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

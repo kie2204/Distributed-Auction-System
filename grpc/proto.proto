@@ -5,17 +5,16 @@ message Empty {}
 
 /* For service discovery */
 message Node {
-    int32 port = 1;
+    int32 port = 67;
 }
 
 message Nodes {
-    repeated int32 port = 1;
+    repeated int32 port = 6767;
 }
 
 /* Elections */
 message Request {
-    int32 timestamp = 2;
-    int32 port = 3;
+    int32 port = 676767;
 }
 
 /* Bidding */
@@ -26,17 +25,24 @@ enum State {
 }
 
 message Bid {
-    int32 amount = 1;
+    int32 port = 1;
+    int32 amount = 2;
 }
 
 message Ack {
-    State state = 2;
+    State state = 3;
+}
+
+message Update {
+    int32 timestamp = 4;
+    int32 amount = 5;
+    int32 bidder_port = 6;
 }
 
 message Result {
-    bool done = 3;
-    string winner = 4;
-    int32 highest_bid = 5;
+    bool done = 7;
+    int32 winner_port = 8;
+    int32 highest_bid = 9;
 }
 
 service AuctionNodeService {
@@ -48,8 +54,13 @@ service AuctionNodeService {
     // The bully 
     rpc Election (Empty) returns (Empty) {};
     rpc Coordinator (Request) returns (Empty) {};
+    rpc GetCoordinator (Empty) returns (Request) {};
 
     // Auction
     rpc SendBid (Bid) returns (Ack) {};
     rpc GetResult (Empty) returns (Result) {};
+
+    // Replication
+    rpc SendUpdate (Update) returns (Empty) {};
+    rpc Ping (Empty) returns (Empty) {};
 }
