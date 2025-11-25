@@ -243,7 +243,7 @@ func (x *Request) GetPort() int32 {
 
 type Bid struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Port          int32                  `protobuf:"varint,1,opt,name=port,proto3" json:"port,omitempty"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Amount        int32                  `protobuf:"varint,2,opt,name=amount,proto3" json:"amount,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -279,11 +279,11 @@ func (*Bid) Descriptor() ([]byte, []int) {
 	return file_proto_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *Bid) GetPort() int32 {
+func (x *Bid) GetName() string {
 	if x != nil {
-		return x.Port
+		return x.Name
 	}
-	return 0
+	return ""
 }
 
 func (x *Bid) GetAmount() int32 {
@@ -341,7 +341,8 @@ type Update struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Timestamp     int32                  `protobuf:"varint,4,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
 	Amount        int32                  `protobuf:"varint,5,opt,name=amount,proto3" json:"amount,omitempty"`
-	BidderPort    int32                  `protobuf:"varint,6,opt,name=bidder_port,json=bidderPort,proto3" json:"bidder_port,omitempty"`
+	BidderName    string                 `protobuf:"bytes,6,opt,name=bidder_name,json=bidderName,proto3" json:"bidder_name,omitempty"`
+	Done          bool                   `protobuf:"varint,7,opt,name=done,proto3" json:"done,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -390,18 +391,25 @@ func (x *Update) GetAmount() int32 {
 	return 0
 }
 
-func (x *Update) GetBidderPort() int32 {
+func (x *Update) GetBidderName() string {
 	if x != nil {
-		return x.BidderPort
+		return x.BidderName
 	}
-	return 0
+	return ""
+}
+
+func (x *Update) GetDone() bool {
+	if x != nil {
+		return x.Done
+	}
+	return false
 }
 
 type Result struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Done          bool                   `protobuf:"varint,7,opt,name=done,proto3" json:"done,omitempty"`
-	WinnerPort    int32                  `protobuf:"varint,8,opt,name=winner_port,json=winnerPort,proto3" json:"winner_port,omitempty"`
-	HighestBid    int32                  `protobuf:"varint,9,opt,name=highest_bid,json=highestBid,proto3" json:"highest_bid,omitempty"`
+	Done          bool                   `protobuf:"varint,8,opt,name=done,proto3" json:"done,omitempty"`
+	Winner        string                 `protobuf:"bytes,9,opt,name=winner,proto3" json:"winner,omitempty"`
+	HighestBid    int32                  `protobuf:"varint,10,opt,name=highest_bid,json=highestBid,proto3" json:"highest_bid,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -443,11 +451,11 @@ func (x *Result) GetDone() bool {
 	return false
 }
 
-func (x *Result) GetWinnerPort() int32 {
+func (x *Result) GetWinner() string {
 	if x != nil {
-		return x.WinnerPort
+		return x.Winner
 	}
-	return 0
+	return ""
 }
 
 func (x *Result) GetHighestBid() int32 {
@@ -470,20 +478,21 @@ const file_proto_proto_rawDesc = "" +
 	"\aRequest\x12\x14\n" +
 	"\x04port\x18\x9f\xa7) \x01(\x05R\x04port\"1\n" +
 	"\x03Bid\x12\x12\n" +
-	"\x04port\x18\x01 \x01(\x05R\x04port\x12\x16\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x16\n" +
 	"\x06amount\x18\x02 \x01(\x05R\x06amount\"#\n" +
 	"\x03Ack\x12\x1c\n" +
-	"\x05state\x18\x03 \x01(\x0e2\x06.StateR\x05state\"_\n" +
+	"\x05state\x18\x03 \x01(\x0e2\x06.StateR\x05state\"s\n" +
 	"\x06Update\x12\x1c\n" +
 	"\ttimestamp\x18\x04 \x01(\x05R\ttimestamp\x12\x16\n" +
 	"\x06amount\x18\x05 \x01(\x05R\x06amount\x12\x1f\n" +
-	"\vbidder_port\x18\x06 \x01(\x05R\n" +
-	"bidderPort\"^\n" +
+	"\vbidder_name\x18\x06 \x01(\tR\n" +
+	"bidderName\x12\x12\n" +
+	"\x04done\x18\a \x01(\bR\x04done\"U\n" +
 	"\x06Result\x12\x12\n" +
-	"\x04done\x18\a \x01(\bR\x04done\x12\x1f\n" +
-	"\vwinner_port\x18\b \x01(\x05R\n" +
-	"winnerPort\x12\x1f\n" +
-	"\vhighest_bid\x18\t \x01(\x05R\n" +
+	"\x04done\x18\b \x01(\bR\x04done\x12\x16\n" +
+	"\x06winner\x18\t \x01(\tR\x06winner\x12\x1f\n" +
+	"\vhighest_bid\x18\n" +
+	" \x01(\x05R\n" +
 	"highestBid*-\n" +
 	"\x05State\x12\v\n" +
 	"\aSUCCESS\x10\x00\x12\b\n" +
