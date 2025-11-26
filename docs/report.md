@@ -42,3 +42,6 @@ Our protocol can also work in the presence of failures.
 - If a follower fails, the system will continue as usual; the leader will simply ignore the failed follower. 
 - If a leader fails, the followers will eventually discover the failure and start an election. Then a follower will be promoted as the new leader. 
 - If the client can no longer reach the server, and it knows multiple ports, it will reconnect to a new port and discover the new leader. From there, bidding can continue as usual. 
+
+## Link to repository
+[https://github.com/kie2204/Distributed-Auction-System](https://github.com/kie2204/Distributed-Auction-System)
