@@ -25,5 +25,13 @@ In tries to cas some  of a failover (leader crashes) the pings from the follower
 Our implementation is 100% linearizable!
 
 ## Correctness 2
-Our protocol works correctly in the absence of failures (during normal operation). The client can connect to the leader
+Our protocol works as expected during normal operation (in the absence of failures). 
+- The client can connect to any node and discover the leader if necessary. 
+- Bids can be sent to the leader without issue, and the server replicates the bids to any working followers before sending a success reply. 
+- The state can be queried on any of the nodes, whether they are leaders or followers.
 
+Our protocol can also work in the presence of failures. 
+
+- If a follower fails, the system will continue as usual; the leader will simply ignore the failed follower. 
+- If a leader fails, the followers will eventually discover the failure and start an election. Then a follower will be promoted as the new leader. 
+- If the client can no longer reach the server, and it knows multiple ports, it will reconnect to a new port and discover the new leader. From there, bidding can continue as usual. 
