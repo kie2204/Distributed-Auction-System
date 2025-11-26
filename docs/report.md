@@ -17,8 +17,8 @@ The servers use leader-based replication to ensure n-1 fault tolerance. The lead
 To avoid a crashed leader not being discovered the followers ping the leader every five seconds with a five second timeout. The timeout is five seconds, and not something less like 500 ms, to avoid unnecessary failovers due to slow connection.
 
 To ensure zero data loss we use synchronous replication. This is because we are handling "money" and care more for data loss more than latancy. 
-The leader update it's followers through an rpc call and the followers updates thier variables and send back an acknowledgement.
-A follower crashing doesn't really affect the system. Although synchronous replication is used the leader immediately gets a connection error when trying to update a crashed follower. This avoids unnecessary latency of waiting for a timeout because the follower won't send back an acknowledgement.
+The leader update it's followers through an rpc call and the followers updates their variables and send back an acknowledgement.
+A follower crashing doesn't really affect the system. Although synchronous replication is used, the leader immediately gets a connection error when trying to update a crashed follower. This avoids unnecessary latency of waiting for a timeout because the follower won't send back an acknowledgement.
 
 A failover (leader chrashes and new leader gets elected) gets started when either a followers ping gets timedout or a client tries to get data but can't due to crash of leader. The system calls an election and use bully algorithm to choose new leader.
 
