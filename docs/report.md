@@ -14,12 +14,13 @@ We use a simple service discovery algorithm. The first node will always connect 
 ### Replication
 The servers use leader-based replication to ensure n-1 fault tolerance. The leader is elected through the bully algorithm where their ID is their port number. Once a leader (coordinator) is elected its followers recieve changes from the leader. 
 
-To avoid a crashed leader not being discovered the followers ping the leader every five seconds with a five second timeout. The timeout is five seconds to avoid unnecessary failovers.
+To avoid a crashed leader not being discovered the followers ping the leader every five seconds with a five second timeout. The timeout is five seconds, and not something less like 500 ms, to avoid unnecessary failovers due to slow connection.
 
-To ensure zero data loss we use synchronous replication. This is because we are handling money and care more for data loss than latancy. 
-rashing doesn't really affect the system. Although synchronous repclient tries to get some data.
-le case on refused error immediately ,when the follower is crashed.
-In tries to cas some  of a failover (leader crashes) the pings from the followers or when a client gets 
+To ensure zero data loss we use synchronous replication. This is because we are handling "money" and care more for data loss more than latancy. 
+The leader update it's followers through an rpc call and the followers updates thier variables and send back an acknowledgement.
+A follower crashing doesn't really affect the system. Although synchronous replication is used the leader immediately gets a connection error when trying to update a crashed follower. This avoids unnecessary latency of waiting for a timeout because the follower won't send back an acknowledgement.
+
+A failover (leader chrashes and new leader gets elected) gets started when either a followers ping gets timedout or a client tries to get data but can't due to crash of leader. The system calls an election and use bully algorithm to choose new leader.
 
 ## Correctness 1
 Our implementation is 100% linearizable!
