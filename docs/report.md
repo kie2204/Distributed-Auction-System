@@ -23,7 +23,13 @@ A follower crashing doesn't really affect the system. Although synchronous repli
 A failover (leader chrashes and new leader gets elected) gets started when either a followers ping gets timedout or a client tries to get data but can't due to crash of leader. The system calls an election and use bully algorithm to choose new leader.
 
 ## Correctness 1
-Our implementation is 100% linearizable!
+Linearizability is when a system gives out the illusion of having only one copy of some data, when in reality the data is distributed between multiple nodes in their own data storages. Having one copy of data means that every request to read this data will result in the same data being sent to every requester, given the server recieved the requesters' requests at the same time. If the requests were recieved independently, this promise would not apply since the data could have been changed in the mean time. However, if the server recieved no writes between 2 reads, those 2 reads should get the same respond. 
+
+Our system consists of multiple server nodes, where one of these nodes is the leader. The leader's job is to respond to the clients querys and make updates to the stored data. That means only the leader can make changes and only the leader can respond to clients about the auction. Every time the leader makes changes to the data, the leader sends updates to all the follower nodes about what has been changed to keep them updated. If the leader goes down, a new leader is elected with the new data and the auction may continue. The clients find out who the new leader is by asking one of the other server nodes, and since there is only one leader all clients will get the port for that one leader. We can then safly assume that the system is linearizable. 
+
+Actually, I lied. We can not assume that the system is linearizable, since there still is some edge cases that makes the system somewhat not linearizable. One of the cases are as follows: If the leader only sends out the updates to some of the followers before the crash and if the new leader only has the old data, this would not be linearizable either. Here we could have made use of lamport timestamps so that the followers only elect a leader who has the new data. A node which recieved an election notice would first compare the sender's and its own lamport timestamp to see which one had the newest data. If the timestamps are equal, then it would compare the ports.
+
+All in all, safly assuming that a system is linearizable is hard. Perfect linearizability is close to impossible to achive.
 
 ## Correctness 2
 Our protocol works as expected during normal operation (in the absence of failures). 

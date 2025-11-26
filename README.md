@@ -8,7 +8,7 @@
 ### Running the servers
 1. To run a server, run this command in your terminal: `go run server/server.go`.
 2. Repeat step 1. `n - 1` times, where `n` is the amount of server nodes you want.
-3. Lastly, run the same command again but with the argument `ready` at the end: `go run server/server.go ready`. This creates the last server and tells it to the other nodes.
+3. Lastly, run the same command again but with the argument `ready` at the end: `go run server/server.go ready`. This creates the last server and tells the other nodes.
 
 ### Running the clients
 1. To run a client, run this command in your terminal: `go run client/client.go <name> <node_port> (<node_port>)...`, where `<name>` is an optional name for the client and `<node_port>` is the port of one of the server nodes. You can add as many node port arguments as you would like, as long as they exist in the system (port 33345 is a server node per default) (we recommend at least 2). The client can ask these nodes for the current coordinator's port.
