@@ -53,6 +53,7 @@ func main() {
 	}
 
 	go leaderCheck(server)
+	go timer()
 
 	select {}
 }
@@ -111,7 +112,7 @@ func (s *Server) Election(ctx context.Context, in *proto.Empty) (*proto.Empty, e
 
 		if isLeader {
 			log.Printf("I, port %d, am now coordinator", port)
-			go timer()
+
 			leaderPort = port
 			for _, n := range nodes {
 				go n.Coordinator(context.Background(), &proto.Request{Port: port})
@@ -129,11 +130,16 @@ func (s *Server) Coordinator(ctx context.Context, in *proto.Request) (*proto.Emp
 }
 
 func (s *Server) GetCoordinator(ctx context.Context, in *proto.Empty) (*proto.Request, error) {
+	if leaderPort == 0 {
+		go s.Election(context.Background(), &proto.Empty{})
+		return nil, fmt.Errorf("no coordinator found, try again later")
+	}
+
 	if leaderPort != port {
 		_, err := nodes[leaderPort].Ping(context.Background(), &proto.Empty{})
 		if err != nil {
 			go s.Election(context.Background(), &proto.Empty{})
-			return nil, fmt.Errorf("Coordinator is offline, try again later")
+			return nil, fmt.Errorf("coordinator is offline, try again later")
 		}
 	}
 
@@ -195,7 +201,7 @@ func add_client(_port int32, announce bool) {
 
 // ======================== Bidding ==========================
 
-var timerTime = 0
+var timerTime = -1
 
 var timestamp int32 = 0
 var highest_bid int32 = 0
@@ -254,7 +260,9 @@ func (s *Server) GetResult(ctx context.Context, in *proto.Empty) (*proto.Result,
 func timer() {
 	for timerTime < 20 {
 		time.Sleep(1 * time.Second)
-		timerTime++
+		if timerTime != -1 && leaderPort == port {
+			timerTime++
+		}
 	}
 	done = true
 	log_message(timestamp, port, "timer", "Auction is done.")
@@ -302,7 +310,7 @@ func leaderCheck(s *Server) {
 				go s.Election(context.Background(), &proto.Empty{})
 			}
 		}
-		time.Sleep(30 * time.Second)
+		time.Sleep(5 * time.Second)
 	}
 }
 
